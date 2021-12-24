@@ -15,19 +15,19 @@ import javax.inject.Inject
 
 
 class FirebaseHandler @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
-    private val firebaseDatabase: FirebaseDatabase
+//    private val firebaseAuth: FirebaseAuth,
+//    private val firebaseDatabase: FirebaseDatabase
 ) {
 
-    private val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
-    private var reference: DatabaseReference? = firebaseDatabase.reference
+//    private val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
+//    private var reference: DatabaseReference? = firebaseDatabase.reference
 
-    fun checkCurrentUser(): Boolean = (firebaseUser != null)
+//    fun checkCurrentUser(): Boolean = (firebaseUser != null)
 
     fun signInWithEmailAndPassword(email: String, pass: String): Flow<DataState<Boolean>> = flow {
         Log.i(LOG_KEY,"signIn = $email + $pass")
         emit(DataState.Loading())
-        delay(100)
+        delay(1000)
         emit(DataState.Success(true))
 
 //        trySend(DataState.Loading())

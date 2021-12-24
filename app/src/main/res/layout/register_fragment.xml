@@ -7,17 +7,83 @@
         <variable
             name="viewModel"
             type="by.godevelopment.firebaselearn.ui.register.RegisterViewModel" />
+        <import type="android.view.View" />
     </data>
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/register_screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.register.RegisterFragment">
+        android:gravity="center"
+        android:padding="3dp"
+        tools:context=".presentation.ui.register.RegisterFragment"
+        android:orientation="vertical"
+        >
+
+        <ProgressBar
+            android:id="@+id/prog_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible"
+            />
 
         <TextView
+            android:id="@+id/helloMessage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_margin="5dp"
+            android:text="@string/header_register_text"
+            tools:text="Register page"
+            />
 
-    </FrameLayout>
+        <EditText
+            android:id="@+id/user_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:text="@={viewModel.email}"
+            android:hint="@string/enter_email"
+            android:inputType="textEmailAddress"
+            android:nextFocusDown="@id/user_password"
+            tools:text="Enter email"
+            />
+
+        <EditText
+            android:id="@+id/user_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:text="@={viewModel.password}"
+            android:hint="@string/enter_password"
+            android:inputType="textPassword"
+            tools:text="Enter password"
+            />
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:enabled="@{viewModel.isEnableBtnReg}"
+            android:onClick="@{() -> viewModel.onClickReg()}"
+            android:text="@string/registration"
+            tools:text="registration" />
+
+        <Button
+            android:id="@+id/enter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:onClick="@{() -> viewModel.onClickBack()}"
+            android:text="@string/back"
+            tools:text="Back to main"
+            />
+
+    </LinearLayout>
 </layout>

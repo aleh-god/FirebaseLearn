@@ -4,5 +4,7 @@
     <string name="enter_password">enter password</string>
     <string name="enter_email">enter email</string>
     <string name="registration">Registration</string>
-    <string name="header_text">Login</string>
+    <string name="back">Back to main</string>
+    <string name="header_login_text">Login page</string>
+    <string name="header_register_text">Register page</string>
 </resources>

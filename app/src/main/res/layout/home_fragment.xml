@@ -9,15 +9,34 @@
             type="by.godevelopment.firebaselearn.ui.home.HomeViewModel" />
     </data>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.home.HomeFragment">
+        tools:context=".ui.home.HomeFragment"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
 
         <TextView
+            android:id="@+id/on_board_message"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Hello" />
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:gravity="center"
+            android:text="Hello, user"
+            />
 
-    </FrameLayout>
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:onClick="@{() -> viewModel.onClick()}"
+            android:text="logout"
+            />
+
+    </LinearLayout>
 </layout>

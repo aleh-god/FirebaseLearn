@@ -1,6 +1,7 @@
 package by.godevelopment.firebaselearn.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +9,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import by.godevelopment.firebaselearn.R
+import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.databinding.MainFragmentBinding
+import by.godevelopment.firebaselearn.domain.model.EventState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
@@ -33,23 +39,26 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
-        setupUI()
+        setupTriggerUI()
         return binding.root
     }
 
-    private fun setupUI() {
-        lifecycleScope.launchWhenCreated {
-            viewModel.eventState.collect {
-                if (it.runNavReg) {
-                    findNavController().navigate(R.id.action_main_fragment_to_registerFragment)
-                    onDestroy()     // Не успел за вечер нагуглить как правильно настроить параметры action. Может дестрой сработает?
+    private fun setupTriggerUI() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventState.collect {
+                    when (it) {
+                        is EventState.RunNav -> {
+                            findNavController().navigate(it.destination)
+                            onDestroy()
+                        }
+                        is EventState.Alert -> {
+                            Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
+                            Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
+                        }
+                        is EventState.Hold -> {}
+                    }
                 }
-                if (it.runNavHome) {
-                    findNavController().navigate(R.id.action_main_fragment_to_homeFragment)
-                    onDestroy()
-                }
-                if (it.alertMessage != null)
-                    Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
