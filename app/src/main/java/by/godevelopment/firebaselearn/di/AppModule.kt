@@ -12,11 +12,11 @@ import javax.inject.Singleton
 @Module
 object AppModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-//
-//    @Provides
-//    @Singleton
-//    fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
 }

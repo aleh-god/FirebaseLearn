@@ -39,6 +39,9 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
+        if (viewModel.checkCurrentUser())
+            findNavController().navigate(R.id.action_main_fragment_to_homeFragment)
+
         setupTriggerUI()
         return binding.root
     }

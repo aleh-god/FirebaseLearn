@@ -86,6 +86,8 @@ class MainViewModel @Inject constructor(
         Log.i(LOG_KEY, "MainViewModel onClickReg()")
         _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_registerFragment)
     }
+    
+    fun checkCurrentUser(): Boolean = firebaseHandler.checkCurrentUser()
 
     /** Convenience method to transform a [Flow] to a [StateFlow]. */
     private fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> {
