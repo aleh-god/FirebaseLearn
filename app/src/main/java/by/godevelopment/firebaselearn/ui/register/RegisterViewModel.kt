@@ -46,37 +46,62 @@ class RegisterViewModel @Inject constructor(
         }
     }.toStateFlow(false)
 
-
     init {
         viewModelScope.launch {
             onClickRegEvent.collect {
-                Log.i(LOG_KEY, "RegisterViewModel onClickLoginEvent.collect $it")
+                Log.i(LOG_KEY, "RegisterViewModel onClickRegEvent.collect = $it")
                 if (it) {
-                    firebaseHandler.createUserWithEmailAndPassword(
+                    onClickRegEvent.value = false
+                    isLoading.value = true
+                    val result = firebaseHandler.registerInFireStore(
                         email.value,
                         password.value
-                    ).collect { state ->
-                        Log.i(LOG_KEY, "RegisterViewModel signInWithEmailAndPassword.collect $state")
-                        when (state) {
-                            is DataState.Loading -> {
-                                isLoading.value = true
-                            }
-                            is DataState.Success -> {
-                                _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
-                                isLoading.value = false
-                            }
-                            is DataState.Error -> {
-                                _eventState.value = EventState.Alert(
-                                    alertMessage = "Проблема с сервером авторизации!"
-                                )
-                                isLoading.value = false
-                            }
-                        }
+                    )
+                    Log.i(LOG_KEY, "RegisterViewModel onClickRegEvent.collect = $result")
+                    if (result) {
+                        _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
+                        isLoading.value = false
+                    } else {
+                        _eventState.value = EventState.Alert(
+                            alertMessage = "Проблема с сервером авторизации!"
+                        )
+                        isLoading.value = false
                     }
                 }
             }
         }
     }
+
+//    init {
+//        viewModelScope.launch {
+//            onClickRegEvent.collect {
+//                Log.i(LOG_KEY, "RegisterViewModel onClickLoginEvent.collect $it")
+//                if (it) {
+//                    firebaseHandler.createUserWithEmailAndPassword(
+//                        email.value,
+//                        password.value
+//                    ).collect { state ->
+//                        Log.i(LOG_KEY, "RegisterViewModel signInWithEmailAndPassword.collect $state")
+//                        when (state) {
+//                            is DataState.Loading -> {
+//                                isLoading.value = true
+//                            }
+//                            is DataState.Success -> {
+//                                _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
+//                                isLoading.value = false
+//                            }
+//                            is DataState.Error -> {
+//                                _eventState.value = EventState.Alert(
+//                                    alertMessage = "Проблема с сервером авторизации!"
+//                                )
+//                                isLoading.value = false
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     fun onClickReg() {
         Log.i(LOG_KEY, "RegisterViewModel onClickReg()")

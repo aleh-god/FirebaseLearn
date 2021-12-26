@@ -51,31 +51,57 @@ class MainViewModel @Inject constructor(
             onClickLoginEvent.collect {
                 Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
                 if (it) {
-                    firebaseHandler.signInWithEmailAndPassword(
+                    isLoading.value = true
+                    val result = firebaseHandler.logInWithEmail(
                         email.value,
                         password.value
-                    ).collect { state ->
-                        Log.i(LOG_KEY, "MainViewModel signInWithEmailAndPassword.collect $state")
-                        when (state) {
-                            is DataState.Loading -> {
-                                isLoading.value = true
-                            }
-                            is DataState.Success -> {
-                                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
-                                isLoading.value = false
-                            }
-                            is DataState.Error -> {
-                                _eventState.value = EventState.Alert(
-                                    alertMessage = "Проблема с сервером авторизации!"
-                                )
-                                isLoading.value = false
-                            }
-                        }
+                    )
+                    Log.i(LOG_KEY, "MainViewModel logInWithEmail = $result")
+                    if (result == null) {
+                        _eventState.value = EventState.Alert(
+                            alertMessage = "Проблема с сервером авторизации!"
+                        )
+                        isLoading.value = false
+                    } else {
+                        _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
+                        isLoading.value = false
                     }
+                    onClickLoginEvent.value = false
                 }
             }
         }
     }
+
+//    init {
+//        viewModelScope.launch {
+//            onClickLoginEvent.collect {
+//                Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
+//                if (it) {
+//                    firebaseHandler.signInWithEmailAndPassword(
+//                        email.value,
+//                        password.value
+//                    ).collect { state ->
+//                        Log.i(LOG_KEY, "MainViewModel signInWithEmailAndPassword.collect $state")
+//                        when (state) {
+//                            is DataState.Loading -> {
+//                                isLoading.value = true
+//                            }
+//                            is DataState.Success -> {
+//                                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
+//                                isLoading.value = false
+//                            }
+//                            is DataState.Error -> {
+//                                _eventState.value = EventState.Alert(
+//                                    alertMessage = "Проблема с сервером авторизации!"
+//                                )
+//                                isLoading.value = false
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     fun onClickLogin() {
         Log.i(LOG_KEY, "MainViewModel onClickLogin()")
