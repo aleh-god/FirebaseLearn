@@ -24,7 +24,7 @@
             android:id="@+id/prog_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isLoadingProgBar ? View.VISIBLE : View.GONE}"
             tools:visibility="visible"
             />
 

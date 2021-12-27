@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.godevelopment.firebaselearn.R
+import by.godevelopment.firebaselearn.common.AuthException
 import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
-import by.godevelopment.firebaselearn.domain.model.DataState
 import by.godevelopment.firebaselearn.domain.model.EventState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -21,91 +21,60 @@ class RegisterViewModel @Inject constructor(
     // input Flow
     val email =  MutableStateFlow("")
     val password =  MutableStateFlow("")
-    private val onClickRegEvent =  MutableStateFlow(false)
 
     // output Flow
     private val _eventState: MutableStateFlow<EventState> =  MutableStateFlow(EventState.Hold)
     val eventState: StateFlow<EventState> = _eventState
+    private val _isLoadingProgBar =  MutableStateFlow(false)
+    val isLoadingProgBar: StateFlow<Boolean> = _isLoadingProgBar
+    private val _isEnableBtnReg = MutableStateFlow(false)
+    val isEnableBtnReg: StateFlow<Boolean> = _isEnableBtnReg
 
-    // для прогресс бара
-    val isLoading =  MutableStateFlow(false)
 
-    val isEnableBtnReg: StateFlow<Boolean> = combine(email, password) {
+    private val checkFields = combine(email, password) {
             email, pass ->
-        Log.i(LOG_KEY, "RegisterViewModel userState.map $email + $pass")
-        if (email.isNullOrEmpty() && pass.isNullOrEmpty()) {
-            Log.i(LOG_KEY, "RegisterViewModel EventState.Alert create")
-            _eventState.value = EventState.Alert(
-                alertMessage = "Поля пусты!"
-            )
-            delay(100)
+        Log.i(LOG_KEY, "MainViewModel userState.map $email + $pass")
+        val check = email.isNotBlank() && pass.isNotBlank()
+        if (!check) {
+            _eventState.value = EventState.Alert("Заполните все поля!")
+            delay(300)
             _eventState.value = EventState.Hold
             false
-        } else {
-            true
-        }
-    }.toStateFlow(false)
+        } else if (pass.length < 6) {
+            _eventState.value = EventState.Alert("Пароль должен содержать, как минимум 6 символов!")
+            delay(300)
+            _eventState.value = EventState.Hold
+            false
+        } else true
+    }
 
     init {
         viewModelScope.launch {
-            onClickRegEvent.collect {
-                Log.i(LOG_KEY, "RegisterViewModel onClickRegEvent.collect = $it")
-                if (it) {
-                    onClickRegEvent.value = false
-                    isLoading.value = true
-                    val result = firebaseHandler.registerInFireStore(
-                        email.value,
-                        password.value
-                    )
-                    Log.i(LOG_KEY, "RegisterViewModel onClickRegEvent.collect = $result")
-                    if (result) {
-                        _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
-                        isLoading.value = false
-                    } else {
-                        _eventState.value = EventState.Alert(
-                            alertMessage = "Проблема с сервером авторизации!"
-                        )
-                        isLoading.value = false
-                    }
-                }
+            checkFields.collect {
+                Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
+                _isEnableBtnReg.value = it
             }
         }
     }
 
-//    init {
-//        viewModelScope.launch {
-//            onClickRegEvent.collect {
-//                Log.i(LOG_KEY, "RegisterViewModel onClickLoginEvent.collect $it")
-//                if (it) {
-//                    firebaseHandler.createUserWithEmailAndPassword(
-//                        email.value,
-//                        password.value
-//                    ).collect { state ->
-//                        Log.i(LOG_KEY, "RegisterViewModel signInWithEmailAndPassword.collect $state")
-//                        when (state) {
-//                            is DataState.Loading -> {
-//                                isLoading.value = true
-//                            }
-//                            is DataState.Success -> {
-//                                _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
-//                                isLoading.value = false
-//                            }
-//                            is DataState.Error -> {
-//                                _eventState.value = EventState.Alert(
-//                                    alertMessage = "Проблема с сервером авторизации!"
-//                                )
-//                                isLoading.value = false
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     fun onClickReg() {
         Log.i(LOG_KEY, "RegisterViewModel onClickReg()")
-        onClickRegEvent.value = true
+        viewModelScope.launch {
+            _isLoadingProgBar.value = true
+            _isEnableBtnReg.value = false
+            try {
+                firebaseHandler.registerInFireStore(
+                    email.value,
+                    password.value
+                )
+                _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
+            } catch (e: AuthException) {
+                _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
+            } finally {
+                _isLoadingProgBar.value = false
+                _isEnableBtnReg.value = true
+            }
+        }
     }
 
     fun onClickBack() {

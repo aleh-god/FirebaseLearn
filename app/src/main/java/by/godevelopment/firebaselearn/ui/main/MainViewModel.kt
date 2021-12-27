@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.godevelopment.firebaselearn.R
+import by.godevelopment.firebaselearn.common.AuthException
 import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
-import by.godevelopment.firebaselearn.domain.model.DataState
 import by.godevelopment.firebaselearn.domain.model.EventState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -22,90 +22,54 @@ class MainViewModel @Inject constructor(
     // input Flow
     val email =  MutableStateFlow("")
     val password =  MutableStateFlow("")
-    private val onClickLoginEvent =  MutableStateFlow(false)
 
     // output Flow
     private val _eventState: MutableStateFlow<EventState> =  MutableStateFlow(EventState.Hold)
     val eventState: StateFlow<EventState> = _eventState
+    private val _isLoadingProgBar =  MutableStateFlow(false)
+    val isLoadingProgBar: StateFlow<Boolean> = _isLoadingProgBar
+    private val _isEnableBtnLogin = MutableStateFlow(false)
+    val isEnableBtnLogin: StateFlow<Boolean> = _isEnableBtnLogin
 
-    val isLoading =  MutableStateFlow(false)
-
-    val isEnableBtnLogin: StateFlow<Boolean> = combine(email, password) {
+    private val checkFields = combine(email, password) {
         email, pass ->
         Log.i(LOG_KEY, "MainViewModel userState.map $email + $pass")
-        if (email.isNullOrEmpty() && pass.isNullOrEmpty()) {
-            Log.i(LOG_KEY, "MainViewModel EventState.Alert create")
-            _eventState.value = EventState.Alert(
-                alertMessage = "Поля пусты!"
-            )
-            delay(100)
+        val check = email.isNotBlank() && pass.isNotBlank()
+        if (!check) {
+            _eventState.value = EventState.Alert("Заполните все поля!")
+            delay(300)
             _eventState.value = EventState.Hold
             false
-        } else {
-            true
-        }
-    }.toStateFlow(false)
+        } else true
+    }
 
     init {
         viewModelScope.launch {
-            onClickLoginEvent.collect {
+            checkFields.collect {
                 Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
-                if (it) {
-                    isLoading.value = true
-                    val result = firebaseHandler.logInWithEmail(
-                        email.value,
-                        password.value
-                    )
-                    Log.i(LOG_KEY, "MainViewModel logInWithEmail = $result")
-                    if (result == null) {
-                        _eventState.value = EventState.Alert(
-                            alertMessage = "Проблема с сервером авторизации!"
-                        )
-                        isLoading.value = false
-                    } else {
-                        _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
-                        isLoading.value = false
-                    }
-                    onClickLoginEvent.value = false
+                _isEnableBtnLogin.value = it
                 }
             }
         }
-    }
-
-//    init {
-//        viewModelScope.launch {
-//            onClickLoginEvent.collect {
-//                Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
-//                if (it) {
-//                    firebaseHandler.signInWithEmailAndPassword(
-//                        email.value,
-//                        password.value
-//                    ).collect { state ->
-//                        Log.i(LOG_KEY, "MainViewModel signInWithEmailAndPassword.collect $state")
-//                        when (state) {
-//                            is DataState.Loading -> {
-//                                isLoading.value = true
-//                            }
-//                            is DataState.Success -> {
-//                                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
-//                                isLoading.value = false
-//                            }
-//                            is DataState.Error -> {
-//                                _eventState.value = EventState.Alert(
-//                                    alertMessage = "Проблема с сервером авторизации!"
-//                                )
-//                                isLoading.value = false
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     fun onClickLogin() {
         Log.i(LOG_KEY, "MainViewModel onClickLogin()")
-        onClickLoginEvent.value = true
+        viewModelScope.launch {
+            _isLoadingProgBar.value = true
+            _isEnableBtnLogin.value = false
+            try {
+                firebaseHandler.logInWithEmail(
+                    email.value,
+                    password.value
+                )
+                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
+            } catch (e: AuthException) {
+                _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
+            } finally {
+                _isLoadingProgBar.value = false
+                _isEnableBtnLogin.value = true
+            }
+        }
     }
 
     fun onClickReg() {
@@ -119,9 +83,4 @@ class MainViewModel @Inject constructor(
     private fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> {
         return this.stateIn(viewModelScope, SharingStarted.Lazily, initialValue)
     }
-//
-//    data class UserState(
-//        var userEmail: String = "",
-//        var userPassword: String = "",
-//    )
 }
