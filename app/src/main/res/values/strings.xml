@@ -7,4 +7,5 @@
     <string name="back">Back to main</string>
     <string name="header_login_text">Login page</string>
     <string name="header_register_text">Register page</string>
+    <string name="welcome_message">Welcome, anon</string>
 </resources>

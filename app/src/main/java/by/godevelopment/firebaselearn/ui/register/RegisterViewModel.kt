@@ -9,7 +9,6 @@ import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
 import by.godevelopment.firebaselearn.domain.model.EventState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,25 +32,24 @@ class RegisterViewModel @Inject constructor(
 
     private val checkFields = combine(email, password) {
             email, pass ->
-        Log.i(LOG_KEY, "MainViewModel userState.map $email + $pass")
+        Log.i(LOG_KEY, "RegisterViewModel userState.map $email + $pass")
         val check = email.isNotBlank() && pass.isNotBlank()
         if (!check) {
             _eventState.value = EventState.Alert("Заполните все поля!")
-            delay(300)
-            _eventState.value = EventState.Hold
             false
         } else if (pass.length < 6) {
             _eventState.value = EventState.Alert("Пароль должен содержать, как минимум 6 символов!")
-            delay(300)
-            _eventState.value = EventState.Hold
             false
-        } else true
+        } else {
+            _eventState.value = EventState.Hold
+            true
+        }
     }
 
     init {
         viewModelScope.launch {
             checkFields.collect {
-                Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
+                Log.i(LOG_KEY, "RegisterViewModel onClickLoginEvent.collect $it")
                 _isEnableBtnReg.value = it
             }
         }
@@ -67,7 +65,7 @@ class RegisterViewModel @Inject constructor(
                     email.value,
                     password.value
                 )
-                _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
+                _eventState.value = EventState.RunNav(R.id.action_register_fragment_to_main_fragment)
             } catch (e: AuthException) {
                 _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
             } finally {
@@ -79,11 +77,6 @@ class RegisterViewModel @Inject constructor(
 
     fun onClickBack() {
         Log.i(LOG_KEY, "RegisterViewModel onClickBack()")
-        _eventState.value = EventState.RunNav(R.id.action_registerFragment_to_main_fragment)
-    }
-
-    /** Convenience method to transform a [Flow] to a [StateFlow]. */
-    private fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> {
-        return this.stateIn(viewModelScope, SharingStarted.Lazily, initialValue)
+        _eventState.value = EventState.RunNav(R.id.action_register_fragment_to_main_fragment)
     }
 }

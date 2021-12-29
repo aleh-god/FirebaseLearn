@@ -9,7 +9,6 @@ import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
 import by.godevelopment.firebaselearn.domain.model.EventState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,10 +36,11 @@ class MainViewModel @Inject constructor(
         val check = email.isNotBlank() && pass.isNotBlank()
         if (!check) {
             _eventState.value = EventState.Alert("Заполните все поля!")
-            delay(300)
-            _eventState.value = EventState.Hold
             false
-        } else true
+        } else {
+            _eventState.value = EventState.Hold
+            true
+        }
     }
 
     init {
@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
                     email.value,
                     password.value
                 )
-                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_homeFragment)
+                _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_home_fragment)
             } catch (e: AuthException) {
                 _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
             } finally {
@@ -74,13 +74,8 @@ class MainViewModel @Inject constructor(
 
     fun onClickReg() {
         Log.i(LOG_KEY, "MainViewModel onClickReg()")
-        _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_registerFragment)
+        _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_register_fragment)
     }
     
     fun checkCurrentUser(): Boolean = firebaseHandler.checkCurrentUser()
-
-    /** Convenience method to transform a [Flow] to a [StateFlow]. */
-    private fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> {
-        return this.stateIn(viewModelScope, SharingStarted.Lazily, initialValue)
-    }
 }

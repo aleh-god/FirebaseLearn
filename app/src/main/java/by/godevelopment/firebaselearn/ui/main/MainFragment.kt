@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -40,7 +39,7 @@ class MainFragment : Fragment() {
         binding.viewModel = viewModel
 
         if (viewModel.checkCurrentUser())
-            findNavController().navigate(R.id.action_main_fragment_to_homeFragment)
+            findNavController().navigate(R.id.action_main_fragment_to_home_fragment)
 
         setupTriggerUI()
         return binding.root
@@ -53,13 +52,16 @@ class MainFragment : Fragment() {
                     when (it) {
                         is EventState.RunNav -> {
                             findNavController().navigate(it.destination)
-                            onDestroy()
+//                            onDestroy()
                         }
                         is EventState.Alert -> {
                             Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
-                            Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
+                            // Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
+                            binding.helloMessage.text = it.alertMessage
                         }
-                        is EventState.Hold -> {}
+                        is EventState.Hold -> {
+                            binding.helloMessage.text = getString(R.string.welcome_message)
+                        }
                     }
                 }
             }

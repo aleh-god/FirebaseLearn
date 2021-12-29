@@ -1,21 +1,19 @@
 package by.godevelopment.firebaselearn.ui.home
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import by.godevelopment.firebaselearn.R
-import dagger.hilt.android.AndroidEntryPoint
 import by.godevelopment.firebaselearn.databinding.HomeFragmentBinding
-import by.godevelopment.firebaselearn.ui.main.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -47,8 +45,8 @@ class HomeFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.clickEvent.collect {
                     if (it) {
-                            findNavController().navigate(R.id.action_homeFragment_to_main_fragment)
-                            onDestroy()
+                            findNavController().navigate(R.id.action_home_fragment_to_main_fragment)
+//                            onDestroy()
                         }
                 }
             }

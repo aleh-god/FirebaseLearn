@@ -1,14 +1,12 @@
 package by.godevelopment.firebaselearn.ui.register
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +16,6 @@ import by.godevelopment.firebaselearn.R
 import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.databinding.RegisterFragmentBinding
 import by.godevelopment.firebaselearn.domain.model.EventState
-import by.godevelopment.firebaselearn.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -52,13 +49,16 @@ class RegisterFragment : Fragment() {
                     when (it) {
                         is EventState.RunNav -> {
                             findNavController().navigate(it.destination)
-                            onDestroy()
+//                            onDestroy()
                         }
                         is EventState.Alert -> {
-                            Log.i(LOG_KEY, "RegisterFragment alertMessage ${it.alertMessage}")
-                            Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
+                            Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
+                            // Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
+                            binding.helloMessage.text = it.alertMessage
                         }
-                        is EventState.Hold -> {}
+                        is EventState.Hold -> {
+                            binding.helloMessage.text = getString(R.string.welcome_message)
+                        }
                     }
                 }
             }
