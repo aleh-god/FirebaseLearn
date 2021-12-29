@@ -22,8 +22,6 @@
         <action
             android:id="@+id/action_main_fragment_to_register_fragment"
             app:destination="@id/register_fragment"
-            app:popUpTo="@id/main_fragment"
-            app:popUpToInclusive="true"
             />
     </fragment>
 
