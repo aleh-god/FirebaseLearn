@@ -8,6 +8,7 @@ import by.godevelopment.firebaselearn.R
 import by.godevelopment.firebaselearn.common.AuthException
 import by.godevelopment.firebaselearn.common.EMPTY_STRING_VALUE
 import by.godevelopment.firebaselearn.common.LOG_KEY
+import by.godevelopment.firebaselearn.domain.helpers.StringHelper
 import by.godevelopment.firebaselearn.domain.model.EventState
 import by.godevelopment.firebaselearn.domain.usecase.CheckCurrentUserUseCase
 import by.godevelopment.firebaselearn.domain.usecase.LogInWithEmailUseCase
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val logInWithEmailUseCase: LogInWithEmailUseCase,
-    private val checkCurrentUserUseCase: CheckCurrentUserUseCase
+    private val checkCurrentUserUseCase: CheckCurrentUserUseCase,
+    private val stringHelper: StringHelper
 ) : ViewModel() {
     // input Flow
     val email =  MutableStateFlow(EMPTY_STRING_VALUE)
@@ -38,7 +40,7 @@ class MainViewModel @Inject constructor(
         Log.i(LOG_KEY, "MainViewModel userState.map $email + $pass")
         val check = email.isNotBlank() && pass.isNotBlank()
         if (!check) {
-            _eventState.value = EventState.Alert("Заполните все поля!")
+            _eventState.value = EventState.Alert(stringHelper.getString(R.string.alert_pull_fields))
             false
         } else {
             _eventState.value = EventState.Hold
@@ -67,7 +69,9 @@ class MainViewModel @Inject constructor(
                 )
                 _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_home_fragment)
             } catch (e: AuthException) {
-                _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
+                _eventState.value = EventState.Alert(
+                    stringHelper.getString(R.string.alert_auth_server_trouble)
+                )
             } finally {
                 _isLoadingProgBar.value = false
                 _isEnableBtnLogin.value = true

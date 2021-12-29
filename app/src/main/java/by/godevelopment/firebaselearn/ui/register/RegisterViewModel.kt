@@ -7,6 +7,7 @@ import by.godevelopment.firebaselearn.R
 import by.godevelopment.firebaselearn.common.AuthException
 import by.godevelopment.firebaselearn.common.EMPTY_STRING_VALUE
 import by.godevelopment.firebaselearn.common.LOG_KEY
+import by.godevelopment.firebaselearn.domain.helpers.StringHelper
 import by.godevelopment.firebaselearn.domain.model.EventState
 import by.godevelopment.firebaselearn.domain.usecase.RegisterInFireStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerInFireStoreUseCase: RegisterInFireStoreUseCase
+    private val registerInFireStoreUseCase: RegisterInFireStoreUseCase,
+    private val stringHelper: StringHelper
 ): ViewModel() {
     // input Flow
     val email =  MutableStateFlow(EMPTY_STRING_VALUE)
@@ -36,10 +38,10 @@ class RegisterViewModel @Inject constructor(
         Log.i(LOG_KEY, "RegisterViewModel userState.map $email + $pass")
         val check = email.isNotBlank() && pass.isNotBlank()
         if (!check) {
-            _eventState.value = EventState.Alert("Заполните все поля!")
+            _eventState.value = EventState.Alert(stringHelper.getString(R.string.alert_pull_fields))
             false
         } else if (pass.length < 6) {
-            _eventState.value = EventState.Alert("Пароль должен содержать, как минимум 6 символов!")
+            _eventState.value = EventState.Alert(stringHelper.getString(R.string.alert_pass_length))
             false
         } else {
             _eventState.value = EventState.Hold
@@ -68,7 +70,9 @@ class RegisterViewModel @Inject constructor(
                 )
                 _eventState.value = EventState.RunNav(R.id.action_register_fragment_to_main_fragment)
             } catch (e: AuthException) {
-                _eventState.value = EventState.Alert("Проблема с сервером авторизации!")
+                _eventState.value = EventState.Alert(
+                    stringHelper.getString(R.string.alert_auth_server_trouble)
+                )
             } finally {
                 _isLoadingProgBar.value = false
                 _isEnableBtnReg.value = true

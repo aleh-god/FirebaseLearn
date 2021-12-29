@@ -8,4 +8,7 @@
     <string name="header_login_text">Login page</string>
     <string name="header_register_text">Register page</string>
     <string name="welcome_message">Welcome, anon</string>
+    <string name="alert_pull_fields">Заполните все поля!</string>
+    <string name="alert_auth_server_trouble">Проблема с сервером авторизации!</string>
+    <string name="alert_pass_length">Пароль должен содержать, как минимум 6 символов!</string>
 </resources>
