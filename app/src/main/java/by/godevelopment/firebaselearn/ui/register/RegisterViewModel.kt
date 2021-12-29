@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.godevelopment.firebaselearn.R
 import by.godevelopment.firebaselearn.common.AuthException
+import by.godevelopment.firebaselearn.common.EMPTY_STRING_VALUE
 import by.godevelopment.firebaselearn.common.LOG_KEY
-import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
 import by.godevelopment.firebaselearn.domain.model.EventState
+import by.godevelopment.firebaselearn.domain.usecase.RegisterInFireStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val firebaseHandler: FirebaseHandler
+    private val registerInFireStoreUseCase: RegisterInFireStoreUseCase
 ): ViewModel() {
     // input Flow
-    val email =  MutableStateFlow("")
-    val password =  MutableStateFlow("")
+    val email =  MutableStateFlow(EMPTY_STRING_VALUE)
+    val password =  MutableStateFlow(EMPTY_STRING_VALUE)
 
     // output Flow
     private val _eventState: MutableStateFlow<EventState> =  MutableStateFlow(EventState.Hold)
@@ -61,7 +62,7 @@ class RegisterViewModel @Inject constructor(
             _isLoadingProgBar.value = true
             _isEnableBtnReg.value = false
             try {
-                firebaseHandler.registerInFireStore(
+                registerInFireStoreUseCase(
                     email.value,
                     password.value
                 )

@@ -56,7 +56,6 @@ class MainFragment : Fragment() {
                         }
                         is EventState.Alert -> {
                             Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
-                            // Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
                             binding.helloMessage.text = it.alertMessage
                         }
                         is EventState.Hold -> {

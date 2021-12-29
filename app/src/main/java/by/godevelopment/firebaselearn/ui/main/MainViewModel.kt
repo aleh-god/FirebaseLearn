@@ -1,13 +1,16 @@
 package by.godevelopment.firebaselearn.ui.main
 
+import android.provider.Settings.System.getString
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.godevelopment.firebaselearn.R
 import by.godevelopment.firebaselearn.common.AuthException
+import by.godevelopment.firebaselearn.common.EMPTY_STRING_VALUE
 import by.godevelopment.firebaselearn.common.LOG_KEY
-import by.godevelopment.firebaselearn.data.firebase.FirebaseHandler
 import by.godevelopment.firebaselearn.domain.model.EventState
+import by.godevelopment.firebaselearn.domain.usecase.CheckCurrentUserUseCase
+import by.godevelopment.firebaselearn.domain.usecase.LogInWithEmailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,12 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val firebaseHandler: FirebaseHandler
+    private val logInWithEmailUseCase: LogInWithEmailUseCase,
+    private val checkCurrentUserUseCase: CheckCurrentUserUseCase
 ) : ViewModel() {
-
     // input Flow
-    val email =  MutableStateFlow("")
-    val password =  MutableStateFlow("")
+    val email =  MutableStateFlow(EMPTY_STRING_VALUE)
+    val password =  MutableStateFlow(EMPTY_STRING_VALUE)
 
     // output Flow
     private val _eventState: MutableStateFlow<EventState> =  MutableStateFlow(EventState.Hold)
@@ -58,7 +61,7 @@ class MainViewModel @Inject constructor(
             _isLoadingProgBar.value = true
             _isEnableBtnLogin.value = false
             try {
-                firebaseHandler.logInWithEmail(
+                logInWithEmailUseCase(
                     email.value,
                     password.value
                 )
@@ -77,5 +80,5 @@ class MainViewModel @Inject constructor(
         _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_register_fragment)
     }
     
-    fun checkCurrentUser(): Boolean = firebaseHandler.checkCurrentUser()
+    fun checkCurrentUser(): Boolean = checkCurrentUserUseCase()
 }

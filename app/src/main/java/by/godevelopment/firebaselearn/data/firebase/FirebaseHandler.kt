@@ -24,6 +24,14 @@ class FirebaseHandler @Inject constructor(
         }
     }
 
+    suspend fun getNameCurrentUser(): String = withContext(ioDispatcher) {
+        try {
+            firebaseAuth.currentUser?.email ?: "anon"
+        } catch (e: Exception) {
+            throw AuthException()
+        }
+    }
+
     suspend fun logInWithEmail(email: String, pass: String): Unit
     = withContext(ioDispatcher) {
         try {

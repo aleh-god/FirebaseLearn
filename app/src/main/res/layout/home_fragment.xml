@@ -25,7 +25,8 @@
             android:layout_margin="5dp"
             android:padding="5dp"
             android:gravity="center"
-            android:text="Hello, user"
+            android:text="@{viewModel.welcomeMessage}"
+            tools:text="Hello, user"
             />
 
         <Button
