@@ -8,13 +8,13 @@ class AppPreferences @Inject constructor(appContext: Context) {
 
     private val sharedPreferences = appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
-    fun setCurrentPartyId(partyId: Long) {
+    fun setCurrentAccountId(partyId: Long) {
         sharedPreferences.edit {
             putLong(PREF_CURRENT_KEY, partyId)
         }
     }
 
-    fun getCurrentPartyId(): Long = sharedPreferences.getLong(PREF_CURRENT_KEY, NO_KEY)
+    fun getCurrentAccountId(): Long = sharedPreferences.getLong(PREF_CURRENT_KEY, NO_KEY)
 
     companion object {
         private const val PREFERENCE_NAME = "app_pref"
