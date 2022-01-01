@@ -13,6 +13,7 @@ import by.godevelopment.firebaselearn.domain.model.EventState
 import by.godevelopment.firebaselearn.domain.usecase.CheckCurrentUserUseCase
 import by.godevelopment.firebaselearn.domain.usecase.LogInWithEmailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,6 +50,7 @@ class MainViewModel @Inject constructor(
     }
 
     init {
+        Log.i(LOG_KEY, "MainViewModel init")
         viewModelScope.launch {
             checkFields.collect {
                 Log.i(LOG_KEY, "MainViewModel onClickLoginEvent.collect $it")
@@ -80,9 +82,13 @@ class MainViewModel @Inject constructor(
     }
 
     fun onClickReg() {
-        Log.i(LOG_KEY, "MainViewModel onClickReg()")
-        _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_register_fragment)
+            Log.i(LOG_KEY, "MainViewModel onClickReg()")
+            _eventState.value = EventState.RunNav(R.id.action_main_fragment_to_register_fragment)
     }
     
     fun checkCurrentUser(): Boolean = checkCurrentUserUseCase()
+
+    fun resetEventState() {
+        _eventState.value = EventState.Hold
+    }
 }

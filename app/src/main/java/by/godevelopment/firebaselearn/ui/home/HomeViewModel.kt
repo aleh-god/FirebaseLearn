@@ -1,8 +1,10 @@
 package by.godevelopment.firebaselearn.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.godevelopment.firebaselearn.common.EMPTY_STRING_VALUE
+import by.godevelopment.firebaselearn.common.LOG_KEY
 import by.godevelopment.firebaselearn.domain.usecase.GetNameCurrentUserUseCase
 import by.godevelopment.firebaselearn.domain.usecase.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +30,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClick() {
+        Log.i(LOG_KEY, "HomeViewModel onClick")
         logOutUseCase()
         clickEvent.value = true
     }

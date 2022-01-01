@@ -37,22 +37,21 @@ class RegisterFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater,R.layout.register_fragment, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-
         setupTriggerUI()
         return binding.root
     }
 
     private fun setupTriggerUI() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.eventState.collect {
                     when (it) {
                         is EventState.RunNav -> {
+                            Log.i(LOG_KEY, "RegisterFragment findNavController().navigate ${it.destination}")
                             findNavController().navigate(it.destination)
-//                            onDestroy()
                         }
                         is EventState.Alert -> {
-                            Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
+                            Log.i(LOG_KEY, "RegisterFragment alertMessage ${it.alertMessage}")
                             // Toast.makeText(context, it.alertMessage, Toast.LENGTH_SHORT).show()
                             binding.helloMessage.text = it.alertMessage
                         }
@@ -63,5 +62,11 @@ class RegisterFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        Log.i(LOG_KEY, "RegisterFragment onStop()")
+        viewModel.resetEventState()
+        super.onStop()
     }
 }

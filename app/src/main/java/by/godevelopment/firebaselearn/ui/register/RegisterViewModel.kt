@@ -11,6 +11,7 @@ import by.godevelopment.firebaselearn.domain.helpers.StringHelper
 import by.godevelopment.firebaselearn.domain.model.EventState
 import by.godevelopment.firebaselearn.domain.usecase.RegisterInFireStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -81,7 +82,11 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun onClickBack() {
-        Log.i(LOG_KEY, "RegisterViewModel onClickBack()")
-        _eventState.value = EventState.RunNav(R.id.action_register_fragment_to_main_fragment)
+            Log.i(LOG_KEY, "RegisterViewModel onClickBack()")
+            _eventState.value = EventState.RunNav(R.id.action_register_fragment_to_main_fragment)
+    }
+
+    fun resetEventState() {
+        _eventState.value = EventState.Hold
     }
 }

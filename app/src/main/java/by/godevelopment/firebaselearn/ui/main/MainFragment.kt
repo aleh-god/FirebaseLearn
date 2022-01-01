@@ -23,11 +23,18 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
+    companion object {
+        fun newInstance() = MainFragment()
+    }
+
     private lateinit var binding: MainFragmentBinding
     private val viewModel: MainViewModel by viewModels()
 
-    companion object {
-        fun newInstance() = MainFragment()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.i(LOG_KEY, "MainFragment onCreate")
+        if (viewModel.checkCurrentUser())
+            findNavController().navigate(R.id.action_main_fragment_to_home_fragment)
     }
 
     override fun onCreateView(
@@ -37,22 +44,22 @@ class MainFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-
-        if (viewModel.checkCurrentUser())
-            findNavController().navigate(R.id.action_main_fragment_to_home_fragment)
-
         setupTriggerUI()
         return binding.root
     }
 
     private fun setupTriggerUI() {
-        lifecycleScope.launch {
+        Log.i(LOG_KEY, "MainFragment setupTriggerUI")
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.i(LOG_KEY, "MainFragment setupTriggerUI lifecycleScope.launch")
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Log.i(LOG_KEY, "MainFragment setupTriggerUI lifecycleScope.launch .STARTED")
                 viewModel.eventState.collect {
+                    Log.i(LOG_KEY, "MainFragment viewModel.eventState.collect $it")
                     when (it) {
                         is EventState.RunNav -> {
+                            Log.i(LOG_KEY, "MainFragment findNavController().navigate ${it.destination}")
                             findNavController().navigate(it.destination)
-//                            onDestroy()
                         }
                         is EventState.Alert -> {
                             Log.i(LOG_KEY, "MainFragment alertMessage ${it.alertMessage}")
@@ -65,5 +72,11 @@ class MainFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        Log.i(LOG_KEY, "MainFragment onStop()")
+        viewModel.resetEventState()
+        super.onStop()
     }
 }

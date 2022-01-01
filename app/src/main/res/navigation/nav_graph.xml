@@ -34,8 +34,6 @@
         <action
             android:id="@+id/action_home_fragment_to_main_fragment"
             app:destination="@id/main_fragment"
-            app:popUpTo="@id/home_fragment"
-            app:popUpToInclusive="true"
             />
     </fragment>
 
